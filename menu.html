@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Satisfy|Bree+Serif|Candal|PT+Sans|Crimson+Text|Boogaloo">
+  <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="css/animate.css">
+  <link rel="shortcut icon" type="image/png" href="img/logo.png"/>
+    <style>
+      .create_new_item 
+      {
+        position: fixed;
+        top:80%;
+        left:92%;
+      }
+     
+      span{
+        color: #fff;
+      }
+      .modal-dialog{
+        font-family:sans-serif;
+        font-weight: bold;
+        font-size:20px;
+        color: #034f84;
+
+      }
+
+  .modal-header{
+    background-color: #d64161;
+    color: #fff;
+    padding: 16px ;
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Crimson Text';
+  }
+ label
+ {
+  color: #a94442;
+  font-size: 20px;
+  font-family:'Cri';
+ }
+ .modal-footer{
+  border: none;
+  font-family: 'Crimson Text';
+ }
+ .modal-footer .btn-info{
+  padding: 12px 40px;
+  background-color:  #d64161;
+ }
+ .fa-home{
+  font-size: 30px;
+  margin-left:5px;
+ }
+ 
+ .fa-trash{
+  color:#a94442;
+  padding: 5px;
+  font-size: 20px;
+ }
+ .fa-inr{
+  padding-left:3px;
+  padding-top: 1px;
+ }
+ .fa-pencil-square-o{
+  color:green;
+  font-size: 20px;
+ }
+ .po{
+  font-family: 'Crimson Text';
+  font-size:25px;
+  margin-left: 10px;
+  color:#A52A2A;
+  font-weight: bolder;
+  position: relative;
+}
+   .navbar {
+    -webkit-box-shadow: 0 8px 6px -6px #A1887F   ;
+    -moz-box-shadow: 0 8px 6px -6px #999;
+    box-shadow: 0 8px 6px -6px #A1887F   ;
+    max-height:250px; 
+    //background-color:#ffc107;
+    min-height: 58px;
+}
+
+.navbar-header input[type=text] {
+    padding: 10px 92px;
+    font-size: 17px;
+    border: 1px solid grey;
+    width: 40%;
+    background: #fff;
+    margin-left:330px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.navbar-header button {
+   padding: 10px;
+    background: #e91e63;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none;
+    cursor: pointer;
+}
+
+form.example button:hover {
+    background: #0b7dda;
+}
+
+img{
+  //margin-top: -1%;
+
+}
+  </style>
+  <script type="text/javascript" src="js/angular.js"></script>
+  <script type="text/javascript">
+    var app=angular.module("myapp",[]);
+    app.service("showmenu",function($http){
+            this.show_menu=function(v){
+                     v.collect=""; 
+                     $http.get("test.php")
+                        .then(function(response) {
+                            v.collect = response.data;
+                            v.grab = chunk(v.collect, 4);
+                        });
+            }
+    });
+
+    app.service("new_item",function($http){
+      this.new_item_=function(v,category){
+        alert(v.item+"   "+v.category);
+            var request = $http({ 
+                     method: "post", 
+                     url: "new_item.php", 
+                     headers:{'content-type':'application/x-www-form-urlencoded'}, 
+                     transformRequest: function(obj) {
+                               // alert(groupid);
+                                                  var str = [];
+                                                  for(var p in obj)
+                                                  {
+                                                        //console.log(p);
+                                                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                                                  }                                                      
+                                                 alert(str.join("&"));
+                                                    return str.join("&");
+                                            },
+                     data: { 
+                         item:v.item,
+                         price:v.price,
+                         category:v.category
+                     } 
+                 }); 
+                 request.success(
+                     function( data ) { 
+                          alert(data);
+                          v.show();
+                         v.collect=data;
+                         v.item="";
+                         v.price="";
+                         v.id="";
+                         v.category="";
+                     } 
+                 ); 
+      }
+    });
+
+    app.service("edit_item",function($http){
+      this.edit_item_=function(v,name,price,id,category){
+        v.item=name;
+        v.price=price;
+        v.id=id;
+        v.category=category;
+      }
+    });
+
+    app.service("edit_save",function($http){
+      this.edit_save_=function(v,item,price,id,category){
+        //alert(item+"    "+price+"   "+v.id)
+         var request = $http({ 
+                     method: "post", 
+                     url: "edit_save.php", 
+                     headers:{'content-type':'application/x-www-form-urlencoded'}, 
+                     transformRequest: function(obj) {
+                               // alert(groupid);
+                                                  var str = [];
+                                                  for(var p in obj)
+                                                  {
+                                                        //console.log(p);
+                                                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                                                  }                                                      
+                                               //   alert(str.join("&"));
+                                                    return str.join("&");
+                                            },
+                     data: { 
+                         name:item,
+                         price:price,
+                         id:v.id,
+                         category:v.category
+                     } 
+                 }); 
+                 request.success(
+                     function( data ) { 
+                         v.show();
+                         v.collect=data;
+                         v.collect=data;
+                         v.item="";
+                         v.price="";
+                         v.id="";
+                         v.category="";
+                     } 
+                 ); 
+        
+      }
+    });
+
+    app.service("delete_item",function($http){
+      this.delete_item_=function(v,name,price,id){
+        alert(name+"   "+price+"  "+id);
+         var request = $http({ 
+                     method: "post", 
+                     url: "delete_item.php", 
+                     headers:{'content-type':'application/x-www-form-urlencoded'}, 
+                     transformRequest: function(obj) {
+                               // alert(groupid);
+                                                  var str = [];
+                                                  for(var p in obj)
+                                                  {
+                                                        //console.log(p);
+                                                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                                                  }                                                      
+                                               //   alert(str.join("&"));
+                                                    return str.join("&");
+                                            },
+                     data: { 
+                         name:name,
+                         price:price,
+                         id:id
+                     } 
+                 }); 
+                 request.success(
+                     function( data ) {
+                         v.show(); 
+                         v.collect=data;
+                     } 
+                 ); 
+            }
+       });
+
+app.service('uploadFile', ['$http', function ($http) {
+            this.uploadFiletoServer = function(file, uploadUrl,scope){
+                 var fd = new FormData();
+                 fd.append('file', file);
+                 $http.post(uploadUrl, fd, {
+                     transformRequest: angular.identity,
+                     headers: {'Content-Type': undefined,'Process-Data': false}
+                 })
+                 .success(function(data){
+                    alert(data);
+                    document.getElementById('myid01').value="";
+                     scope.show(); 
+                    
+                 })
+                 .error(function(){
+                    alert("Error");
+                 });
+             }
+         }]);
+
+		function chunk(arr, size) {
+            var newArr = [];
+            for (var i = 0; i < arr.length; i += size) {
+                newArr.push(arr.slice(i, i + size));
+            }
+            return newArr;
+        }
+
+    app.controller("con1",function($scope,$http,showmenu,new_item,edit_item,edit_save,delete_item,uploadFile){
+      $scope.collect="";
+      $scope.item="";
+      $scope.price="";
+      $scope.id="";
+      $scope.category="";
+
+      $scope.clear=function(){
+          $scope.item="";
+          $scope.price="";
+          $scope.id="";
+          $scope.category="";
+      }
+      $scope.show=function(){
+        showmenu.show_menu($scope);            
+      }
+
+      $scope.newitem=function(item,price,category){
+        new_item.new_item_($scope,category);
+        $scope.uploadFile();
+      }
+
+      $scope.edititem=function(item,price,id,category){
+        alert(category);
+        edit_item.edit_item_($scope,item,price,id,category);
+      }
+
+      $scope.editsave=function(item,price,category){
+        edit_save.edit_save_($scope,item,price);
+        $scope.uploadFile();
+      }
+
+      $scope.deleteitem=function(name,price,id){
+        delete_item.delete_item_($scope,name,price,id);
+      }
+
+      $scope.uploadFile = function() {
+        $scope.myFile = $scope.files[0];
+        var file = $scope.myFile; 
+        var url = "upload.php";
+        alert($scope);
+        uploadFile.uploadFiletoServer(file, url,$scope);
+      };
+      $scope.uploadedFile = function(element) {
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          $scope.$apply(function($scope) {
+            $scope.files = element.files;
+            $scope.src = event.target.result  
+          });
+        }
+        reader.readAsDataURL(element.files[0]);
+      }
+});
+     //deleting cookie function for admin
+    function delcookie1()
+         {
+          var c=document.cookie;
+          var mytest1=c.split(';');
+        //alert("before closing:"+mytest1[0]+" "+mytest1[1]);
+          var v1=mytest1[0].substr(0,mytest1[0].search("="));
+          var v2=mytest1[1].substr(0,mytest1[1].search("="));
+          //alert(v1+"  "+v2);
+          document.cookie = mytest1[0]+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          document.cookie = mytest1[1]+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        //alert("close");
+          window.location.assign("logout.php?p1="+v1+"&p2="+v2);   
+}
+   window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("myBtn").style.display = "block";
+    } else {
+        document.getElementById("myBtn").style.display = "none";
+    }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
+
+  </script>
+</head>
+<body ng-app="myapp" ng-controller="con1" ng-init="show()">
+ <nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+    <!--<img src="img/logo.png" class="img-circle" width="80px" height="80px">-->
+      <!--<span class="ap" style="border:2px solid orange;padding: 10px">ITEMS LIST</span>-->
+     <a href="admin.php"  data-toggle="tooltip" data-placement="right" title="Back to Admin Panel"><i class="fa fa-home" aria-hidden="true"> </i></a>
+      <span class="po" style="font-family: 'Crimson Text'">MENU </span>
+       <input type="text" placeholder="Search.." ng-model="test" name="search">
+      <button type="submit"><i class="fa fa-search"></i></button> 
+      <img src="img/add.png" width="40" height="40" data-toggle="modal" data-target="#myModal01" style="margin-left:300px;position: absolute;" data-toggle="tooltip" ng-click="clear()" data-placement="right" title="Additem">
+        <img src="img/dlog.png" width="40" height="40" onclick="delcookie1()" style="margin-left:380px;position: absolute;" data-toggle="tooltip" data-placement="right" title="Logout">
+    </div>
+
+   <!-- <div class="buttons">
+  <button class="btn btn-primary item_menu" data-toggle="modal" data-target="#myModal01">Add Item</button>
+  <button class="btn btn-primary add_item" onclick="delcookie1()">Logout</button>
+   <input type="text" ng-model="test" placeholder="search">
+  </div>-->
+</nav>
+<hr class="first">
+    <div class="container secondhalf">
+       <!-- Modal -->
+  <div class="modal fade" id="myModal01" role="dialog">
+    <div class="modal-dialog">    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Create New Item</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+              <label >Item Name:</label>
+              <input type="text" class="form-control" ng-model="item">
+            </div>
+            <div class="form-group">
+              <label >Item Price:</label>
+              <input type="text" class="form-control" ng-model="price">
+            </div>
+            <div class="form-group">
+              <label >Category:</label>     
+                <select ng-model="category">
+                  <option value="tiffins" ><label>tiffins</label></option>
+                  <option value="north_indian" ><label>north indian</label></option>
+                  <option value="south_indian" ><label>south indian</label></option>
+                  <option value="chat" ><label>chat</label></option>
+                  <option value="juices" ><label>juices</label></option>
+                  <option value="ice_creams" ><label>ice creams</label></option>
+                  <option value="pizza" ><label>pizza & sandwich</label></option>
+                  <option value="chinese" ><label>chinese</label></option>
+                </select>
+            </div>
+            <div class="form-group">
+              <input type="file" id="myid01"ng-model="myFile" class="form-control" accept="image/*" onchange="angular.element(this).scope().uploadedFile(this)">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-dismiss="modal" ng-click="newitem(item,price,category)">Create</button>
+        </div>
+       </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+       <!-- Modal -->
+  <div class="modal fade_modal" id="myModal02" role="dialog"  name="fade_modal">
+    <div class="modal-dialog">    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title text-center">Edit Current Item</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+              <label >Item Name:</label>
+              <input type="text" class="form-control mtext" ng-model="item" ng-required="true">
+            </div>
+            <div class="form-group">
+              <label >Item Price:</label>
+              <input type="text" class="form-control mtext" ng-model="price" ng-required="true">
+            </div>
+            <div class="form-group">
+              <label >Category:</label>     
+                <select ng-model="category">
+                  <option value="tiffins" ><label>tiffins</label></option>
+                  <option value="north_indian" ><label>north indian</label></option>
+                  <option value="south_indian" ><label>south indian</label></option>
+                  <option value="chat" ><label>chat</label></option>
+                  <option value="juices" ><label>juices</label></option>
+                  <option value="ice_creams" ><label>ice creams</label></option>
+                  <option value="pizza" ><label>pizza & sandwich</label></option>
+                </select>
+            </div>
+            <div class="form-group">
+              <input type="file" id="myid01"ng-model="myFile" class="form-control" accept="image/*" onchange="angular.element(this).scope().uploadedFile(this)">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-info" data-dismiss="modal" ng-click="editsave(item,price,category)" ng-disabled="fade_modal.$invalid">Submit</button>
+        </div>
+       </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid secondhalf " style="margin-top:40px;padding: 20px; background: #fafafa">
+    <div class="row" ng-repeat="rows in grab">
+         <div class="col-sm-3 col-xs-12 col-md-3  card_info"   ng-repeat="x in rows | filter:test">
+              <div class="card">
+            <img src={{x.photo}} alt="John"  style="width:100%">
+               <span name="price" class="price">{{x.price}}<i class="fa fa-inr" aria-hidden="true"></i></span>
+            <span class="title">{{x.name}}</span>
+             <a href="#" data-toggle="tooltip" data-placement="right" title="Edit"><i class="fa fa-pencil-square-o" aria-hidden="true" data-toggle="modal" data-target="#myModal02" ng-click="edititem(x.name,x.price,x.id,x.category)"></i></a>
+            <a href="#" data-toggle="tooltip" data-placement="left" title="delete"><i class="fa fa-trash" aria-hidden="true" ng-click="deleteitem(x.name,x.price,x.id)"></i></a>
+             </div>
+          </div>
+ </div>
+</div>
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+
+
+  <!--banner-->
+  <!-- / footer -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/custom.js"></script>
+</body>
+</html>

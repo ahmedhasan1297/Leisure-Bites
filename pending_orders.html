@@ -1,0 +1,126 @@
+<html>
+
+<head>
+  <title></title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="angular.js"></script>
+  <script type="text/javascript">
+    var app = angular.module("myapp", []);
+    app.service("showmenu", function ($http) {
+      this.show_menu = function (v) {
+        v.collect = "";
+        v.fill = [];
+        $http.get("view_pending.php")
+          .then(function (response) {
+            v.collect = response.data;
+            var coll = JSON.stringify(v.collect);
+            //alert( v.collect [0].token);
+            console.log(v.collect);
+            order = [{
+              'fname': 'ahmed',
+              'lname': 'hasan'
+            },
+            {
+              'fname': 'pvp',
+              'lname': 'has'
+            }];
+
+            //console.log(order);
+            k = 1;
+            alert(coll);
+            //alert(v.collect.length);
+            for (var j = 0; j < v.collect.length - 1; ++j) {
+              console.log(v.collect[j].item);
+              for (var i = j + 1; i <= v.collect.length - 1; ++i) {
+
+                if (v.collect[j].token == v.collect[i].token) {
+
+
+                  order = [{
+                    'fname': 'ahmed',
+                    'lname': 'hasan'
+                  },
+                  {
+                    'fname': 'pvp',
+                    'lname': 'has'
+                  }];
+                  //console.log(i);
+                  //    console.log("hai");
+                  console.log(v.collect[i].item);
+
+                }
+                else {
+                  console.log(v.collect[i].item);
+                  console.log("diff");
+                  //     console.log(j);
+                  j = i + 1;
+                }
+              }
+
+              //console.log(j);
+              // console.log("hello");
+              v.filter(v.collect);
+            }
+          });
+      }
+    });
+    app.controller("con1", function ($scope, $http, showmenu) {
+      $scope.collect = "";
+      $scope.show = function () {
+        showmenu.show_menu($scope);
+      }
+      $scope.filter = function (got) {
+
+        prev = 0;
+        angular.forEach(got, function (value) {
+          // console.log(got);
+          if (prev != value.token) {
+            $scope.fill.push({ token: value.token, uname: value.uname });
+          }
+          prev = value.token;
+        });
+        // console.log($scope.fill);
+      }
+    });
+  </script>
+</head>
+
+<body ng-app="myapp" ng-controller="con1" ng-init="show()">
+  <div class="col-sm-6" style="border:1px solid">
+    <div ng-repeat="y in fill">
+
+      <table class="table table-striped">
+
+        <h3>{{y.uname}} {{y.token}}</h3>
+
+        <thead>
+          <tr>
+
+            <th>item</th>
+            <th>price</th>
+            <th>Quant</th>
+            <th>Bill</th>
+
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr ng-repeat="x in collect | filter:y.token">
+            <td> {{x.item}}</td>
+            <td> {{x.price}}</td>
+            <td> {{x.quant}}</td>
+            <td>{{x.price}}</td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      <!--<button type="button" ng-click="send_order(selected,billc)">confirm order</button>-->
+    </div>
+  </div>
+</body>
+
+</html>
